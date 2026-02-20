@@ -1,5 +1,9 @@
-require("dotenv").config();
+require("dotenv").config();  // Carrega .env (se tiver)
+
 const express = require("express");
+const app = express();  // <-- Definição única do app aqui!
+
+// Imports dos seus módulos
 const Console = require("./ConsoleUtils");
 const CryptoUtils = require("./CryptoUtils");
 const SharedUtils = require("./SharedUtils");
@@ -7,40 +11,51 @@ const BotManager = require("./BotManager");
 const TournamentManager = require("./TournamentManager");
 const { checkMaintenance } = require("./MaintenanceMiddleware");
 
+// Outros controllers que você tinha no topo (ajustei pra ficar organizado)
 const {
   BackendUtils,
   UserModel,
   UserController,
-  RoundController,
+  RoundPassController,
   BattlePassController,
   EconomyController,
+  TournamentController,
+  BattlePassController: BattlePassCtrl,  // se tiver duplicata, remova uma
+  EconomyController: EconomyCtrl,
   AnalyticsController,
   FriendsController,
   NewsController,
   MissionsController,
   TournamentXController,
-  MatchmakingController,
-  TournamentController,
   SocialController,
   EventsController,
   authenticate,
-  errorControll,
+  errorController,
   sendShared,
   OnlineCheck,
   VerifyPhoton
 } = require("./BackendUtils");
 
-const express = require('express');
-const app = express();  // <--- isso define 'app'!
+// Middlewares (só uma vez!)
+app.use(express.json());  // <-- Único express.json()
+app.use(checkMaintenance);  // Se tiver mais middlewares, adicione aqui
 
-// Aqui vão middlewares, rotas etc.
-app.use(express.json());
-// ... seu código de rotas, BotManager, TournamentManager etc.
+// ... Coloque aqui o resto do seu código de rotas, controllers, etc.
+// Exemplo: app.use('/api/users', UserController);
+// app.get('/alguma-rota', (req, res) => { ... });
 
-// No final, listen com porta correta pro Render
+// Rota de torneios que você tinha (exemplo)
+app.get("/torneios-preview", (req, res) => {
+  res.setHeader("Cache-Control", "no-store, must-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.sendFile(__dirname + "/public/torneios-preview/index.html");
+});
+
+// No final do arquivo - Porta correta pro Render
 const port = process.env.PORT || 10000;
-app.listen(port, '0.0.0.0', () => {
-  console.log(`Server listening on port ${port}`);
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Server listening on port ${port} on all interfaces`);
 });
 
 app.use(express.json());
