@@ -30,9 +30,10 @@ const {
   VerifyPhoton
 } = require("./BackendUtils");
 
-const app = express();
-const Title = "Stumble Born Backend " + process.env.version;
-const PORT = process.env.PORT || 80;
+const port = process.env.PORT || 10000;  // ou 3000 local, mas prioriza env
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server listening on port ${port} on 0.0.0.0`);
+});
 
 app.use(express.json());
 app.use(checkMaintenance);
