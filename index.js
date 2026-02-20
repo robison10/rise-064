@@ -1,50 +1,38 @@
-require("dotenv").config();  // Carrega .env (se tiver)
+require("dotenv").config();  // Carrega .env se existir
 
 const express = require("express");
-const app = express();  // <-- Definição única do app aqui!
+const app = express();  // Definição única do app aqui!
 
-// Imports dos seus módulos
-const Console = require("./ConsoleUtils");
+// Imports dos seus módulos e controllers (todos que você usa)
+const ConsoleUtils = require("./ConsoleUtils");
 const CryptoUtils = require("./CryptoUtils");
 const SharedUtils = require("./SharedUtils");
 const BotManager = require("./BotManager");
 const TournamentManager = require("./TournamentManager");
 const { checkMaintenance } = require("./MaintenanceMiddleware");
 
-// Outros controllers que você tinha no topo (ajustei pra ficar organizado)
-const {
-  BackendUtils,
-  UserModel,
-  UserController,
-  RoundPassController,
-  BattlePassController,
-  EconomyController,
-  TournamentController,
-  BattlePassController: BattlePassCtrl,  // se tiver duplicata, remova uma
-  EconomyController: EconomyCtrl,
-  AnalyticsController,
-  FriendsController,
-  NewsController,
-  MissionsController,
-  TournamentXController,
-  SocialController,
-  EventsController,
-  authenticate,
-  errorController,
-  sendShared,
-  OnlineCheck,
-  VerifyPhoton
-} = require("./BackendUtils");
+// Controllers (adicionei todos os que aparecem nos seus prints + o que faltava)
+const BackendUtils = require("./BackendUtils");
+const UserController = require("./UserController");
+const TournamentController = require("./TournamentController");
+const SocialController = require("./SocialController");
+const EventsController = require("./EventsController");
+const MatchmakingController = require("./MatchmakingController");  // <-- Esse estava faltando e causou o erro!
+const RoundPassController = require("./RoundPassController");
+const BattlePassController = require("./BattlePassController");
+const EconomyController = require("./EconomyController");
+const AnalyticsController = require("./AnalyticsController");
+const FriendsController = require("./FriendsController");
+const NewsController = require("./NewsController");
+const MissionsController = require("./MissionsController");
+const TournamentXController = require("./TournamentXController");
 
 // Middlewares (só uma vez!)
-app.use(express.json());  // <-- Único express.json()
-app.use(checkMaintenance);  // Se tiver mais middlewares, adicione aqui
+app.use(express.json());
+app.use(checkMaintenance);
 
-// ... Coloque aqui o resto do seu código de rotas, controllers, etc.
-// Exemplo: app.use('/api/users', UserController);
-// app.get('/alguma-rota', (req, res) => { ... });
-
-// Rota de torneios que você tinha (exemplo)
+// ===== ROTAS DO SISTEMA DE TORNEIOS (SEM AUTENTICAÇÃO) =====
+// Servir página de torneios (exemplo que você tinha)
 app.get("/torneios-preview", (req, res) => {
   res.setHeader("Cache-Control", "no-store, must-revalidate");
   res.setHeader("Pragma", "no-cache");
@@ -52,12 +40,25 @@ app.get("/torneios-preview", (req, res) => {
   res.sendFile(__dirname + "/public/torneios-preview/index.html");
 });
 
+// Rota que causou o erro (exemplo)
+app.get("/matchmaking/filter", MatchmakingController.getMatchmakingFilter);
+
+// Outras rotas que você provavelmente tem (adicione as suas reais aqui)
+// Exemplos:
+// app.use("/api/users", UserController);
+// app.use("/api/tournaments", TournamentController);
+// app.use("/api/social", SocialController);
+// app.get("/alguma-rota", (req, res) => { res.send("OK"); });
+
+// Inicialização de managers (se precisar rodar algo no start)
+BotManager.start();           // Se tiver método start
+TournamentManager.start();    // Se tiver
+
 // No final do arquivo - Porta correta pro Render
 const port = process.env.PORT || 10000;
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server listening on port ${port} on all interfaces`);
 });
-
 app.use(express.json());
 app.use(checkMaintenance);
 
