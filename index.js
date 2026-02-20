@@ -30,9 +30,17 @@ const {
   VerifyPhoton
 } = require("./BackendUtils");
 
-const port = process.env.PORT || 10000;  // ou 3000 local, mas prioriza env
+const express = require('express');
+const app = express();  // <--- isso define 'app'!
+
+// Aqui vão middlewares, rotas etc.
+app.use(express.json());
+// ... seu código de rotas, BotManager, TournamentManager etc.
+
+// No final, listen com porta correta pro Render
+const port = process.env.PORT || 10000;
 app.listen(port, '0.0.0.0', () => {
-  console.log(`Server listening on port ${port} on 0.0.0.0`);
+  console.log(`Server listening on port ${port}`);
 });
 
 app.use(express.json());
